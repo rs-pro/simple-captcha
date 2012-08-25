@@ -66,7 +66,7 @@ module SimpleCaptcha #:nodoc
         params << "-wave #{amplitude}x#{frequency}"
         #params << "-gravity 'Center'"
         params << "-gravity \"Center\""
-        if params.index('-pointsize').nil?
+        if params.join(' ').index('-pointsize').nil?
           params << "-pointsize 22"
         end
         params << "-implode 0.2"
