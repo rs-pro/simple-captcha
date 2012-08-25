@@ -28,12 +28,7 @@ module SimpleCaptcha
         body = []
         
         if !code.blank? && Utils::simple_captcha_value(code)
-          #status, headers, body = @app.call(env)
-          #status = 200
-          #body = generate_simple_captcha_image(code)
-          #headers['Content-Type'] = 'image/jpeg'
-          
-          return send_file(generate_simple_captcha_image(code), :type => 'image/jpeg', :disposition => 'inline', :filename =>  'simple_captcha.jpg')
+          return send_file(generate_simple_captcha_image(code), :type => 'image/png', :disposition => 'inline', :filename =>  'simple_captcha.png')
         end
         
         [status, headers, body]
@@ -50,9 +45,9 @@ module SimpleCaptcha
 
         status = options[:status] || 200
         headers = {"Content-Disposition" => "#{options[:disposition]}; filename='#{options[:filename]}'", "Content-Type" => options[:type], 'Content-Transfer-Encoding' => 'binary', 'Cache-Control' => 'private'}
-        response_body = File.open(path, "rb")
-        
-        [status, headers, response_body]
+        response_body = File.open(path, 'rb').read
+        File.unlink(path)
+        [status, headers, [response_body]]
       end
   end
 end

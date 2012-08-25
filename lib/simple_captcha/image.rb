@@ -4,14 +4,7 @@ module SimpleCaptcha #:nodoc
 
     mattr_accessor :image_styles
     @@image_styles = {
-      'embosed_silver'  => ['-fill darkblue', '-shade 20x60', '-background white'],
-      'simply_red'      => ['-fill darkred', '-background white'],
-      'simply_green'    => ['-fill darkgreen', '-background white'],
-      'simply_blue'     => ['-fill darkblue', '-background white'],
-      'distorted_black' => ['-fill darkblue', '-edge 10', '-background white'],
-      'all_black'       => ['-fill darkblue', '-edge 2', '-background white'],
-      'charcoal_grey'   => ['-fill darkblue', '-charcoal 5', '-background white'],
-      'almost_invisible' => ['-fill red', '-solarize 50', '-background white']
+      'simply_blue'     => ['-alpha set -background none -fill darkblue'],
     }
 
     DISTORTIONS = ['low', 'medium', 'high']
@@ -62,21 +55,30 @@ module SimpleCaptcha #:nodoc
         text = Utils::simple_captcha_value(simple_captcha_key)
 
         params = ImageHelpers.image_params(SimpleCaptcha.image_style).dup
-        params << "-size #{SimpleCaptcha.image_size}"
-        params << "-wave #{amplitude}x#{frequency}"
-        #params << "-gravity 'Center'"
+        params << "-size #{SimpleCaptcha.image_size} xc:transparent"
         params << "-gravity \"Center\""
         if params.join(' ').index('-pointsize').nil?
-          params << "-pointsize 22"
+          params << "-pointsize 35"
         end
-        params << "-implode 0.2"
+        # params << "-implode 0.2"
 
-        dst = Tempfile.new(RUBY_VERSION < '1.9' ? 'simple_captcha.jpg' : ['simple_captcha', '.jpg'], SimpleCaptcha.tmp_path)
+        dst = Tempfile.new(RUBY_VERSION < '1.9' ? 'simple_captcha.png' : ['simple_captcha', '.png'], SimpleCaptcha.tmp_path)
         dst.binmode
 
-        #params << "label:#{text} '#{File.expand_path(dst.path)}'"
-        params << "label:#{text} \"#{File.expand_path(dst.path)}\""
-
+        text.split(//).each_with_index do |letter, index|
+          i = -60 + (index*25) + rand(-6..6)
+          params << "-draw \"translate #{i},#{rand(-6..6)} skewX #{rand(-15..15)} gravity center text 0,0 '#{letter}'\" "
+        end
+        
+        params << "-wave #{amplitude}x#{frequency}"
+        
+        (1..10).each do |i|
+          params << "-draw \"polyline #{rand(160)},#{rand(61)} #{rand(160)},#{rand(62)}\""
+        end
+        
+        params << "\"#{File.expand_path(dst.path)}\""
+        
+        # puts "convert " +  params.join(' ')
         SimpleCaptcha::Utils::run("convert", params.join(' '))
 
         dst.close
