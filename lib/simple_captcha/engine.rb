@@ -14,17 +14,11 @@ module SimpleCaptcha
       ActionView::Base.send(:include, SimpleCaptcha::ViewHelper)
       ActionView::Helpers::FormBuilder.send(:include, SimpleCaptcha::FormBuilder)
 
-      if Object.const_defined?("Formtastic")
-        if Formtastic.const_defined?("Helpers")
-          Formtastic::Helpers::FormHelper.builder = SimpleCaptcha::CustomFormBuilder
-        else
-          Formtastic::SemanticFormHelper.builder = SimpleCaptcha::CustomFormBuilder
-        end
+      if Object.const_defined?("Formtastic") && Formtastic.const_defined?("Inputs")
+        require "simple_captcha/formtastic"
       end
     end
 
     config.app_middleware.use SimpleCaptcha::Middleware
   end
 end
-
-

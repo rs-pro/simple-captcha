@@ -1,11 +1,12 @@
-module SimpleCaptcha
-  class CustomFormBuilder < Formtastic::FormBuilder
+require "formtastic"
 
-    private
-
-    def simple_captcha_input(method, options)
-      options.update :object => sanitized_object_name
-      self.send(:show_simple_captcha, options)
+class SimpleCaptchaInput
+  include ::Formtastic::Inputs::Base
+  
+  def to_html
+    input_wrapping do
+      input_html_options.update :object => method
+      label_html << builder.show_simple_captcha(input_html_options)
     end
   end
 end
