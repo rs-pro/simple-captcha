@@ -23,6 +23,22 @@ module SimpleCaptcha #:nodoc
     def self.simple_captcha_value(key) #:nodoc
       SimpleCaptchaData.get_data(key).value rescue nil
     end
+    
+    def self.simple_captcha_new_value(key) #:nodoc
+      begin
+        # very unsafe to display same code over and over
+        value = ''
+        # SimpleCaptcha.length.times{value << (48 + rand(10)).chr}
+        SimpleCaptcha.length.times{value << (65 + rand(26)).chr}
+        d = SimpleCaptchaData.get_data(key)
+        d.value = value
+        d.save!
+        value
+      rescue
+        nil
+      end
+    end
+    
 
     def self.simple_captcha_passed!(key) #:nodoc
       SimpleCaptchaData.remove_data(key)
