@@ -2,27 +2,12 @@ require 'tempfile'
 module SimpleCaptcha #:nodoc
   module ImageHelpers #:nodoc
 
-    mattr_accessor :image_styles
-    @@image_styles = {
-      'simply_blue'     => ['-alpha set -background none -fill darkblue'],
-    }
-
     DISTORTIONS = ['low', 'medium', 'high']
 
     class << self
 
-      def image_params(key = 'simply_blue')
-        image_keys = @@image_styles.keys
-
-        style = begin
-          if key == 'random'
-            image_keys[rand(image_keys.length)]
-          else
-            image_keys.include?(key) ? key : 'simply_blue'
-          end
-        end
-
-        @@image_styles[style]
+      def image_params(color = '#0089d1')
+        ["-alpha set -background none -fill \"#{color}\""]
       end
 
       def distortion(key='low')
@@ -53,31 +38,26 @@ module SimpleCaptcha #:nodoc
       def generate_simple_captcha_image(simple_captcha_key) #:nodoc
         amplitude, frequency = ImageHelpers.distortion(SimpleCaptcha.distortion)
         text = Utils::simple_captcha_new_value(simple_captcha_key)
-
-        params = ImageHelpers.image_params(SimpleCaptcha.image_style).dup
+        params = ImageHelpers.image_params(SimpleCaptcha.image_color).dup
         params << "-size #{SimpleCaptcha.image_size} xc:transparent"
         params << "-gravity \"Center\""
         if params.join(' ').index('-pointsize').nil?
           params << "-pointsize 35"
         end
-        # params << "-implode 0.2"
-
         dst = Tempfile.new(RUBY_VERSION < '1.9' ? 'simple_captcha.png' : ['simple_captcha', '.png'], SimpleCaptcha.tmp_path)
         dst.binmode
-
         text.split(//).each_with_index do |letter, index|
           i = -60 + (index*25) + rand(-6..6)
           params << "-draw \"translate #{i},#{rand(-6..6)} skewX #{rand(-15..15)} gravity center text 0,0 '#{letter}'\" "
         end
-        
+
         params << "-wave #{amplitude}x#{frequency}"
-        
+
         (1..10).each do |i|
           params << "-draw \"polyline #{rand(160)},#{rand(61)} #{rand(160)},#{rand(62)}\""
         end
-        
+
         params << "\"#{File.expand_path(dst.path)}\""
-        
         # puts "convert " +  params.join(' ')
         SimpleCaptcha::Utils::run("convert", params.join(' '))
 
