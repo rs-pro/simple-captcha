@@ -10,8 +10,12 @@ module SimpleCaptcha
 
   autoload :FormBuilder,       'simple_captcha/form_builder'
   autoload :CustomFormBuilder, 'simple_captcha/formtastic'
-
-  autoload :SimpleCaptchaData, 'simple_captcha/simple_captcha_data'
+  
+  if defined?(Mongoid)
+    autoload :SimpleCaptchaData, 'simple_captcha/simple_captcha_data_mongoid'
+  else
+    autoload :SimpleCaptchaData, 'simple_captcha/simple_captcha_data_ar'
+  end
   autoload :Middleware,        'simple_captcha/middleware'
 
   mattr_accessor :image_size
