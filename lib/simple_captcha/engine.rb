@@ -5,8 +5,10 @@ require 'simple_captcha'
 module SimpleCaptcha
   class Engine < ::Rails::Engine
     config.before_initialize do
-      ActiveSupport.on_load :active_record do
-        ActiveRecord::Base.send(:include, SimpleCaptcha::ModelHelpers)
+      unless defined?(Mongoid)
+        ActiveSupport.on_load :active_record do
+          ActiveRecord::Base.send(:include, SimpleCaptcha::ModelHelpers)
+        end
       end
     end
 

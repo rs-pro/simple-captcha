@@ -6,14 +6,16 @@ module SimpleCaptcha
   autoload :ImageHelpers,      'simple_captcha/image'
   autoload :ViewHelper,        'simple_captcha/view'
   autoload :ControllerHelpers, 'simple_captcha/controller'
-  autoload :ModelHelpers,      'simple_captcha/active_record'
 
   autoload :FormBuilder,       'simple_captcha/form_builder'
   autoload :CustomFormBuilder, 'simple_captcha/formtastic'
   
   if defined?(Mongoid)
+    require 'simple_captcha/mongoid'
+    autoload :ModelHelpers,      'simple_captcha/mongoid'
     autoload :SimpleCaptchaData, 'simple_captcha/simple_captcha_data_mongoid'
   else
+    autoload :ModelHelpers,      'simple_captcha/active_record'
     autoload :SimpleCaptchaData, 'simple_captcha/simple_captcha_data_ar'
   end
   autoload :Middleware,        'simple_captcha/middleware'

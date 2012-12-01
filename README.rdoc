@@ -17,18 +17,15 @@ backward compatibility with previous versions of Rails.
 
 ==Requirements
 
-* {Ruby}[http://ruby-lang.org/] >= 1.8.7
+* {Ruby}[http://ruby-lang.org/] >= 1.9
 * {Rails}[http://github.com/rails/rails] >= 3
 * ImageMagick should be installed on your machine to use this plugin.
   visit http://www.imagemagick.org/script/index.php for more details.
+* AR or mongoid
 
 ==Installation
 
-  gem "galetahub-simple_captcha", :require => "simple_captcha"
-
-or
-
-  gem 'galetahub-simple_captcha', :require => 'simple_captcha', :git => 'git://github.com/galetahub/simple-captcha.git'
+  gem "glebtv-simple_captcha", "~> 0.2.0", require: "simple_captcha"
 
 ==Setup
 
